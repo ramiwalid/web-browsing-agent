@@ -1,4 +1,8 @@
-# New LangGraph Project
+# 🕵️‍♂️ Web Agent Malvertising Audit Harness
+
+Welcome to the Web Agent Malvertising Audit Harness! This framework evaluates the vulnerability of autonomous web agents to indirect prompt injections, deceptive UI, and malicious advertisements. Built on **LangGraph**, **browser-use**, and **Playwright**, it allows you to dispatch agents on shopping or research tasks and rigorously track whether they deviate from their goals when exposed to adversarial content.
+
+---
 
 [![CI](https://github.com/langchain-ai/new-langgraph-project/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/langchain-ai/new-langgraph-project/actions/workflows/unit-tests.yml)
 [![Integration Tests](https://github.com/langchain-ai/new-langgraph-project/actions/workflows/integration-tests.yml/badge.svg)](https://github.com/langchain-ai/new-langgraph-project/actions/workflows/integration-tests.yml)
@@ -13,49 +17,49 @@ The core logic defined in `src/agent/graph.py`, showcases an single-step applica
 
 You can extend this graph to orchestrate more complex agentic workflows that can be visualized and debugged in LangGraph Studio.
 
-## Getting Started
+## 🚀 1. Quick Start & Installation
 
-1. Install dependencies, along with the [LangGraph CLI](https://langchain-ai.github.io/langgraph/concepts/langgraph_cli/), which will be used to run the server.
+Ensure you have Python 3.10 or higher installed on your machine.
+
+**1. Clone the repository and install dependencies:**
+```bash
+pip install browser-use langgraph langgraph-cli[inmem] playwright langchain-google-genai langchain-anthropic langchain-openai
+
+## 2. Install playwright browsers 
 
 ```bash
-cd path/to/your/app
-pip install -e . "langgraph-cli[inmem]"
-```
+playwright install 
 
-2. (Optional) Customize the code and project as needed. Create a `.env` file if you need to use secrets.
+## 3. Setup your environment
 
+Create a .env file in the root of the folder
 ```bash
-cp .env.example .env
-```
+LANGSMITH_API_KEY=your_langsmith_api_key_here
+ANTHROPIC_API_KEY=your_api_key_here
+ANONYMIZED_TELEMETRY=false
+BROWSER_USE_CLOUD_SYNC=false
 
-If you want to enable LangSmith tracing, add your LangSmith API key to the `.env` file.
+## 4. Launch the Development Server
+Start the server with the --allow-blocking flag. This prevents Langgraph Studio from crashing when browser-use or Playwright syncs local files/profiles
+```bash
+langgraph dev --allow-blocking
 
-```text
-# .env
-LANGSMITH_API_KEY=lsv2...
-```
+## 5. Once in the Langgraph Studio UI, configure your agent assistant
+-> Navigate to "assistants" in the bottom left-hand corner in the "Input" panel
+-> Create an assistant with any relevant name
+-> Set the appropriate agent settings
+    -> llm_provider -> anthropic
+    -> llm_model -> claude-sonnet-5
+    -> headless -> false (default)
+    -> max_steps -> 10
 
-3. Start the LangGraph Server.
+## 6. Define the agent's task in the input panel
+-> In the input panel, populate the following fields
+    -> User Goal -> set a descriptive prompt of what exactly you want the agent to do. Tell it to return a formatted list of results
+        -> e.g. "Navigate to youtube.com and find 3 videos on AI safety and return their titles in a formatted list" 
+    -> Start URL -> the URL you wish for the agent to navigate to
+    -> Task Id -> the name of the current run (e.g. "studio-run-01")
 
-```shell
-langgraph dev
-```
-
-For more information on getting started with LangGraph Server, [see here](https://langchain-ai.github.io/langgraph/tutorials/langgraph-platform/local-server/).
-
-## How to customize
-
-1. **Define runtime context**: Modify the `Context` class in the `graph.py` file to expose the arguments you want to configure per assistant. For example, in a chatbot application you may want to define a dynamic system prompt or LLM to use. For more information on runtime context in LangGraph, [see here](https://langchain-ai.github.io/langgraph/agents/context/?h=context#static-runtime-context).
-
-2. **Extend the graph**: The core logic of the application is defined in [graph.py](./src/agent/graph.py). You can modify this file to add new nodes, edges, or change the flow of information.
-
-## Development
-
-While iterating on your graph in LangGraph Studio, you can edit past state and rerun your app from previous states to debug specific nodes. Local changes will be automatically applied via hot reload.
-
-Follow-up requests extend the same thread. You can create an entirely new thread, clearing previous history, using the `+` button in the top right.
-
-For more advanced features and examples, refer to the [LangGraph documentation](https://langchain-ai.github.io/langgraph/). These resources can help you adapt this template for your specific use case and build more sophisticated conversational agents.
-
-LangGraph Studio also integrates with [LangSmith](https://smith.langchain.com/) for more in-depth tracing and collaboration with teammates, allowing you to analyze and optimize your chatbot's performance.
+## 7. Click "submit" and allow the agent to run 
+-> Once the agent is finished running, you can navigate to "trace" in the top right-hand corner and observe all of the results/metadata of the run
 
