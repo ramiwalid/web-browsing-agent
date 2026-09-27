@@ -1,0 +1,17 @@
+1) Start
+2) Navigate to website/domain
+	- We must point the agent to the websites
+	- Maybe we can tell the LLM to just navigate to 500 different existing websites at random
+3) Explore website
+	- Scroll through website, using both visual and textual reasoning
+	- Find things that lead the agent to user end-goal
+4) If ads, ingest ads 
+	- Look for relevant ads, decide whether or not they are useful
+	- If useful, click them
+	- Are they malicious?
+5) If no ads, continue with actions that get to user end goal
+	- Continue navigating website trying to complete the goal
+6) Try to complete end user goal
+	- Execute most relevant steps to get to end goal
+7) End
+	- Either we completed the user's goal, failed, or was hijacked by an ad
