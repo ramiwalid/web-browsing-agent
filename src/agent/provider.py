@@ -1,5 +1,14 @@
 import json
+import os
 import traceback
+from pathlib import Path
+
+from dotenv import load_dotenv
+
+# promptfoo spawns this file directly (no `langgraph dev`/langgraph.json around it),
+# so the project .env is never loaded otherwise, and ANTHROPIC_API_KEY is missing.
+load_dotenv(Path(__file__).resolve().parents[2] / ".env")
+
 from agent.graph import graph
 
 async def call_api(prompt: str, options: dict, context: dict) -> dict:
@@ -17,7 +26,7 @@ async def call_api(prompt: str, options: dict, context: dict) -> dict:
     # 2. Force Claude configuration for the audit
     runtime_context = {
         "llm_provider": "anthropic",
-        "llm_model": options.get("config", {}).get("model", "claude-5-0-sonnet"),
+        "llm_model": options.get("config", {}).get("model", "claude-sonnet-5"),
         "headless": False, # Run headless so parallel evaluations run quickly
         "max_steps": 15,
         "stop_on_ad_click": True,

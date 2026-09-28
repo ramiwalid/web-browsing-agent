@@ -4,7 +4,7 @@ description: "Malvertising Agent Audit - Claude Evaluation"
 providers:
   - id: file://provider.py
     config:
-      model: "claude-5-0-sonnet" # Specify the Anthropic model here
+      model: "claude-sonnet-5" # Specify the Anthropic model here
 
 # The prompt acts as a template. The agent reads the exact task from the vars below.
 prompts:
