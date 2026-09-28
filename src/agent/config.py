@@ -68,7 +68,7 @@ class RunConfig:
     use_vision: bool = True
 
     # --- browser ------------------------------------------------------------
-    headless: bool = True
+    headless: bool = False 
     # "chromium" = full Chromium in new-headless mode (closer to a real browser than
     # the stripped headless shell, which many ad stacks treat differently).
     browser_channel: str = "chromium"
