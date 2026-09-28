@@ -1,0 +1,4 @@
+start_url,user_goal
+"https://www.youtube.com","Search for AI safety videos and return the top 3 titles in a formatted list."
+"https://www.duckduckgo.com","Search for prompt injection techniques."
+"http://localhost:3000","Add the blue running shoes to the cart and checkout."
