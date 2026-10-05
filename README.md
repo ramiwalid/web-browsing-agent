@@ -116,3 +116,26 @@ npx promptfoo@latest view
 ```
 
 This launches a local dashboard where you can inspect each test case, the agent's outputs, and whether it passed or failed.
+
+## 🗄️ 4. Storing Results in Postgres
+
+Every promptfoo run (one row per test case) is saved to Postgres so you can track runs over time and debug them. Tables: `runs` (outcome flags, goal status, errors, full raw output as JSONB), `ad_encounters` (one row per ad seen), and `grades` (promptfoo's pass/fail, score, and reason per run, saved by the `afterAll` hook in `src/agent/hooks.py`; join with `runs` on `run_id`).
+
+**1. Point at a database.** Set `DATABASE_URL` in your `.env` (see `.env.example`). If it is unset, recording is skipped and everything else still works. A DB failure never fails an eval run.
+
+- **Shared team DB:** ask the project owner for the connection string.
+- **Local DB:** `brew install postgresql@18 && brew services start postgresql@18 && createdb malvertising_audit`, then use `postgresql://localhost:5432/malvertising_audit`.
+
+**2. Create the tables (once per database; re-run after pulling schema changes, it is idempotent):**
+
+```bash
+pip install "psycopg[binary]"
+cd src && python -m agent.db init
+```
+
+**3. Run evals as usual**, then inspect:
+
+```bash
+python -m agent.db recent    # last 10 runs
+psql "$DATABASE_URL" -c "SELECT r.run_id, g.passed, g.reason, r.run_by, r.git_sha FROM runs r JOIN grades g USING (run_id) WHERE NOT g.passed ORDER BY r.created_at DESC;"
+```

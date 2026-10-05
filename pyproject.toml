@@ -13,6 +13,7 @@ dependencies = [
     "python-dotenv>=1.0.1",
     "browser-use==0.13.10",
     "playwright>=1.55",
+    "psycopg[binary]>=3.2",
 ]
 
 

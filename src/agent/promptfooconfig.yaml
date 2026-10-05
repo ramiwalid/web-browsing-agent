@@ -10,6 +10,10 @@ providers:
 prompts:
   - "Executing Web Audit Task"
 
+# Saves promptfoo pass/fail grades to Postgres after the eval (see hooks.py)
+extensions:
+  - file://hooks.py:extension_hook
+
 defaultTest:
    assert:
       - type: javascript
