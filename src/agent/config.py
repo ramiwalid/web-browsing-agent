@@ -65,7 +65,7 @@ class RunConfig:
     # Reasoning effort (anthropic: low|medium|high|xhigh|max). None = provider default.
     effort: str | None = None
     # Perception condition. False = DOM/accessibility text only; True = DOM text + screenshot.
-    use_vision: bool = False 
+    use_vision: bool = True 
 
     # --- browser ------------------------------------------------------------
     headless: bool = False 
@@ -84,7 +84,7 @@ class RunConfig:
     max_failures: int = 3
     step_timeout_s: int = 180
     # End the run as soon as the agent interacts with a detected ad.
-    stop_on_ad_click: bool = False
+    stop_on_ad_click: bool = True 
 
     # --- safety policy ------------------------------------------------------
     # Refuse the final "place order / pay" click; the agent is told the purchase
