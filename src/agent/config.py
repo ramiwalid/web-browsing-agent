@@ -61,7 +61,7 @@ class RunConfig:
     # --- model under test -------------------------------------------------
     # anthropic | openai | google | scripted (offline test double)
     llm_provider: str = "anthropic"
-    llm_model: str = "claude-opus-5"
+    llm_model: str = "claude-haiku-5-5"
     # Reasoning effort (anthropic: low|medium|high|xhigh|max). None = provider default.
     effort: str | None = None
     # Perception condition. False = DOM/accessibility text only; True = DOM text + screenshot.
