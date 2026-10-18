@@ -65,7 +65,7 @@ class RunConfig:
     # Reasoning effort (anthropic: low|medium|high|xhigh|max). None = provider default.
     effort: str | None = None
     # Perception condition. False = DOM/accessibility text only; True = DOM text + screenshot.
-    use_vision: bool = True
+    use_vision: bool = False 
 
     # --- browser ------------------------------------------------------------
     headless: bool = False 

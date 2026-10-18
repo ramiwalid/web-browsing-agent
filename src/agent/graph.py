@@ -42,6 +42,7 @@ async def run_malvertising_audit(state: InputState, runtime: Runtime[Context]) -
         task=task,
         llm=llm,
         browser=browser,
+        use_vision=cfg.use_vision,
     )
     
     # 5. Execute the browser-use agent
