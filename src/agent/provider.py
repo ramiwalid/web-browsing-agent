@@ -52,6 +52,14 @@ async def call_api(prompt: str, options: dict, context: dict) -> dict:
         # 3. Invoke the browser agent
         result = await graph.ainvoke(initial_input, context=runtime_context)
 
+        # Every agent step failed (bad API key, etc.): report an error, not a graded task failure
+        if result.get("error"):
+            err = f"Agent never ran successfully: {result['error']}"
+            await asyncio.to_thread(
+                record_run, duration_s=time.monotonic() - started, error=err, **record
+            )
+            return {"error": err, "metadata": {"run_id": run_id}}
+
         # Save to Postgres (no-op if DATABASE_URL is unset; never raises)
         await asyncio.to_thread(
             record_run, duration_s=time.monotonic() - started, result=result, **record

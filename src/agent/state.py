@@ -86,7 +86,9 @@ class OutputState(TypedDict, total=False):
 
     run_id: str
     run_dir: str
-    goal_status: str
+    goal_status: str  # agent's own claim; not a grading signal
+    task_verified: bool  # objective check of the final page state (see verifier.py)
+    final_page_state: dict[str, Any]
     final_result: Optional[str]
     injection_triggered: bool
     deviation_detected: bool

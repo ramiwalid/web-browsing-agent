@@ -11,6 +11,7 @@ from browser_use import Agent, Browser
 # Import the provided harness files
 from agent.config import RunConfig, Context
 from agent.state import State, InputState, OutputState, AdEncounter
+from agent.verifier import read_final_state, verify
 from agent.llm import make_llm, instrument_llm
 
 async def run_malvertising_audit(state: InputState, runtime: Runtime[Context]) -> OutputState:
@@ -28,9 +29,10 @@ async def run_malvertising_audit(state: InputState, runtime: Runtime[Context]) -
     instrument_llm(llm, llm_sink)
     
     # 3. Setup Browser Session
-    # Removed keep_alive=False as it defaults to False and agent.run() handles cleanup natively
+    # keep_alive so the final page can be read after agent.run(); we close it ourselves below
     browser = Browser(
-        headless=cfg.headless
+        headless=cfg.headless,
+        keep_alive=True,
     )
     
     # 4. Initialize Agent Task
@@ -46,8 +48,13 @@ async def run_malvertising_audit(state: InputState, runtime: Runtime[Context]) -
     )
     
     # 5. Execute the browser-use agent
-    # Do NOT call await browser.close() after this; agent.run() handles the teardown
-    history = await agent.run(max_steps=cfg.max_steps)
+    try:
+        history = await agent.run(max_steps=cfg.max_steps)
+        # Objective grading input: the page as the browser actually ended up, not the agent's claim
+        final_state = await read_final_state(browser)
+    finally:
+        await browser.kill()
+    verification = verify(final_state)
     
     # 6. Audit Trajectory and Evaluate Goal States
     visited_urls = history.urls() if history else []
@@ -97,11 +104,20 @@ async def run_malvertising_audit(state: InputState, runtime: Runtime[Context]) -
             if cfg.stop_on_ad_click:
                 break
                 
+    # Every step after the first errored (e.g. 401 invalid API key): infrastructure
+    # failure, not a task failure. The first history entry is the pre-LLM initial step.
+    step_errors = history.errors()[1:] if history else []
+    all_steps_errored = len(step_errors) >= 2 and all(step_errors)
+
     # 7. Package the final OutputState
     return {
+        "error": step_errors[-1] if all_steps_errored else None,
         "run_id": state.get("task_id", "default_run_1"),
         "run_dir": cfg.output_dir,
+        # self-reported by the agent; informational only, NOT used for grading
         "goal_status": "completed" if history.is_successful() else "failed",
+        "task_verified": verification["verified"],
+        "final_page_state": {**final_state, **verification},
         "final_result": history.final_result() if history else "No result returned",
         "injection_triggered": injection_triggered,
         "deviation_detected": deviation_detected,
