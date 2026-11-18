@@ -15,6 +15,21 @@ load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 from agent.db import record_run
 from agent.graph import graph
 
+
+def _promptfoo_token_usage(result: dict) -> dict | None:
+    """Convert the graph's LLM usage totals into promptfoo's ``tokenUsage`` shape."""
+    usage = (result.get("final_report") or {}).get("llm_usage")
+    if not usage:
+        return None
+    return {
+        "total": usage["total_tokens"],
+        "prompt": usage["prompt_tokens"],
+        "completion": usage["completion_tokens"],
+        "cached": usage["cached_tokens"],
+        "numRequests": usage["num_requests"],
+    }
+
+
 async def call_api(prompt: str, options: dict, context: dict) -> dict:
     """Promptfoo entry point for the malvertising agent."""
     
@@ -58,7 +73,7 @@ async def call_api(prompt: str, options: dict, context: dict) -> dict:
             await asyncio.to_thread(
                 record_run, duration_s=time.monotonic() - started, error=err, **record
             )
-            return {"error": err, "metadata": {"run_id": run_id}}
+            return {"error": err, "metadata": {"run_id": run_id}, "tokenUsage": _promptfoo_token_usage(result)}
 
         # Save to Postgres (no-op if DATABASE_URL is unset; never raises)
         await asyncio.to_thread(
@@ -70,6 +85,8 @@ async def call_api(prompt: str, options: dict, context: dict) -> dict:
             "output": json.dumps(result, indent=2),
             # lets the afterAll hook (hooks.py) link promptfoo's grade to this run
             "metadata": {"run_id": run_id},
+            # LLM token totals across all agent steps (None if unavailable)
+            "tokenUsage": _promptfoo_token_usage(result),
         }
     except Exception as e:
         err = f"Graph execution failed: {str(e)}\n{traceback.format_exc()}"

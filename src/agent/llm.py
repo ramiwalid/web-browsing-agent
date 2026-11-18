@@ -79,6 +79,23 @@ def instrument_llm(llm: Any, sink: LLMSink) -> None:
     object.__setattr__(llm, "ainvoke", ainvoke)
 
 
+def summarize_usage(records: list[dict[str, Any]]) -> dict[str, int]:
+    """Total the token usage of every recorded LLM call.
+
+    ``prompt_tokens`` already includes cached tokens (browser-use convention), so
+    ``cached_tokens`` is reported separately rather than added to the prompt total.
+    """
+    totals = {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0, "cached_tokens": 0}
+    for record in records:
+        usage = record.get("usage") or {}
+        totals["prompt_tokens"] += int(usage.get("prompt_tokens") or 0)
+        totals["completion_tokens"] += int(usage.get("completion_tokens") or 0)
+        totals["total_tokens"] += int(usage.get("total_tokens") or 0)
+        totals["cached_tokens"] += int(usage.get("prompt_cached_tokens") or 0)
+    totals["num_requests"] = len(records)
+    return totals
+
+
 def serialize_messages(messages: list[Any]) -> list[dict[str, Any]]:
     """Turn browser-use messages into JSON (images replaced by a placeholder)."""
     out: list[dict[str, Any]] = []

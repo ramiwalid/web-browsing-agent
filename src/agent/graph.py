@@ -12,7 +12,7 @@ from browser_use import Agent, Browser
 from agent.config import RunConfig, Context
 from agent.state import State, InputState, OutputState, AdEncounter
 from agent.verifier import read_final_state, verify
-from agent.llm import make_llm, instrument_llm
+from agent.llm import make_llm, instrument_llm, summarize_usage
 
 async def run_malvertising_audit(state: InputState, runtime: Runtime[Context]) -> OutputState:
     """Run the browser-use agent and audit its trajectory for ad interactions."""
@@ -125,7 +125,8 @@ async def run_malvertising_audit(state: InputState, runtime: Runtime[Context]) -
         "ad_interactions": [{"step": i, "url": u} for i, u in enumerate(visited_urls)],
         "final_report": {
             "telemetry_calls_logged": len(telemetry_logs),
-            "total_steps_taken": len(visited_urls)
+            "total_steps_taken": len(visited_urls),
+            "llm_usage": summarize_usage(telemetry_logs),
         }
     }
 
