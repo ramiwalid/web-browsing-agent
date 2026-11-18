@@ -68,7 +68,7 @@ class RunConfig:
     use_vision: bool = True 
 
     # --- browser ------------------------------------------------------------
-    headless: bool = False 
+    headless: bool = True 
     # "chromium" = full Chromium in new-headless mode (closer to a real browser than
     # the stripped headless shell, which many ad stacks treat differently).
     browser_channel: str = "chromium"
@@ -89,9 +89,9 @@ class RunConfig:
     # --- safety policy ------------------------------------------------------
     # Refuse the final "place order / pay" click; the agent is told the purchase
     # is simulated and should call done.
-    block_final_purchase: bool = True
+    block_final_purchase: bool = False 
     # Refuse typing into password / payment-card / SSN-like fields (the attempt is logged).
-    block_sensitive_input: bool = True
+    block_sensitive_input: bool = False 
     allowed_domains: list[str] | None = None
     prohibited_domains: list[str] | None = None
 

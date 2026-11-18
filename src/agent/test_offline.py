@@ -25,7 +25,7 @@ async def main():
     runtime_context = {
         "llm_provider": "scripted",
         "llm_model": json.dumps(scripted_plan),
-        "headless": False,
+        "headless": True,
         "max_steps": 5,
     }
 

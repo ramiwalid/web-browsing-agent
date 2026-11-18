@@ -33,7 +33,7 @@ async def call_api(prompt: str, options: dict, context: dict) -> dict:
     runtime_context = {
         "llm_provider": "anthropic",
         "llm_model": options.get("config", {}).get("model", "claude-haiku-5-5"),
-        "headless": False, # Run headless so parallel evaluations run quickly
+        "headless": True, # Run headless so parallel evaluations run quickly
         "max_steps": 15,
         "stop_on_ad_click": True,
     }
